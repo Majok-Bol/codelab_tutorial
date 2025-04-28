@@ -1,5 +1,6 @@
-import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
+
+import 'package:english_words/english_words.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -7,52 +8,76 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Namer App',
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
-        ),
-        home: MyHomePage(),
-      ),
-    );
+        create: (context) => AppState(),
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Namer App',
+          theme: ThemeData(
+              useMaterial3: true,
+              colorScheme:
+                  ColorScheme.fromSeed(seedColor: Colors.deepOrangeAccent)),
+          home: HomePage(),
+        ));
   }
 }
 
-class MyAppState extends ChangeNotifier {
+//class to handle changes
+//notify others when things change
+class AppState with ChangeNotifier {
+  //generate random word
   var current = WordPair.random();
-  // ↓ Add this.
-  void getNext() {
+  //generate next random word
+//notify others of the changes
+  void getNextWord() {
     current = WordPair.random();
     notifyListeners();
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
+    //create instance of change notifier
+    //watch for changes in change notifier mixin
+    var appStateNow = context.watch<AppState>();
+    var pair = appStateNow.current;
 
     return Scaffold(
       body: Column(
         children: [
-          Text('A random idea:'),
-          Text(appState.current.asLowerCase),
-          // ↓ Add this.
+          Text('A random word:'),
+          BigCard(pair: pair),
+          //add button
           ElevatedButton(
-            onPressed: () {
-              appState.getNext(); // ← This instead of print().
-            },
-            child: Text('Next'),
-          ),
+              onPressed: () {
+                appStateNow.getNextWord();
+              },
+              child: Text('Next'))
         ],
+      ),
+    );
+  }
+}
+
+class BigCard extends StatelessWidget {
+  const BigCard({
+    super.key,
+    required this.pair,
+  });
+
+  final WordPair pair;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      color: theme.colorScheme.primary,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Text(pair.asPascalCase),
       ),
     );
   }
