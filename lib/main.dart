@@ -35,6 +35,17 @@ class AppState with ChangeNotifier {
     current = WordPair.random();
     notifyListeners();
   }
+
+  //favorites
+  var favorites = <WordPair>[];
+  void toggelFavorite() {
+    if (favorites.contains(current)) {
+      favorites.remove(current);
+    } else {
+      favorites.add(current);
+    }
+    notifyListeners();
+  }
 }
 
 class HomePage extends StatelessWidget {
@@ -46,17 +57,35 @@ class HomePage extends StatelessWidget {
     var pair = appStateNow.current;
 
     return Scaffold(
-      body: Column(
-        children: [
-          Text('A random word:'),
-          BigCard(pair: pair),
-          //add button
-          ElevatedButton(
-              onPressed: () {
-                appStateNow.getNextWord();
-              },
-              child: Text('Next'))
-        ],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Text('A random word:'),
+            BigCard(pair: pair),
+            SizedBox(
+              height: 10,
+            ),
+            //add button
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                    onPressed: appStateNow.toggelFavorite,
+                    icon: Icon(Icons.favorite),
+                    label: Text('Favorite')),
+                SizedBox(
+                  width: 10,
+                ),
+                ElevatedButton(
+                    onPressed: () {
+                      appStateNow.getNextWord();
+                    },
+                    child: Text('Next')),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
